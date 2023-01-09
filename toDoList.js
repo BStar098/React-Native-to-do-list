@@ -1,17 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import TaskItem from "./components/TaskItem";
+import { StatusBar } from "expo-status-bar";
 import {
   TextInput,
   KeyboardAvoidingView,
   TouchableOpacity,
   Alert,
   ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import TaskItem from "./components/TaskItem";
 
 export default function App() {
   const [task, setTask] = useState("");
@@ -21,10 +19,7 @@ export default function App() {
   };
   const addTaskToList = () => {
     if (task) {
-      setTaskList((taskList) => [
-        ...taskList,
-        { text: task, key: (Math.random() * Math.random()).toString() },
-      ]);
+      setTaskList((taskList) => [...taskList, task]);
       setTask("");
     } else
       Alert.alert("Error", "Your task cannot be empty!", [
@@ -32,27 +27,28 @@ export default function App() {
       ]);
   };
   const deleteItemFromList = (textContent) => {
-    const newTaskList = taskList.filter((task) => task.text != textContent);
+    const newTaskList = taskList.filter((task) => task != textContent);
     setTaskList(newTaskList);
   };
   return (
     <View style={styles.body}>
-      <StatusBar backgroundColor="#8C7AA9" />
       <View style={styles.scrollViewContainer}>
-        <Text style={styles.toDoListTitle}>Today tasks</Text>
-        <FlatList
-          contentContainerStyle={styles.tasksContainer}
-          data={taskList}
-          renderItem={(itemData) => {
-            return (
+        <StatusBar backgroundColor="#8C7AA9" />
+        <ScrollView contentContainerStyle={styles.toDoListContainer}>
+          <Text style={styles.toDoListTitle}>Today tasks</Text>
+          {taskList.length ? (
+            taskList.map((taskItem, index) => (
               <TaskItem
-                taskItemText={itemData.item.text}
+                key={index}
+                taskItemText={taskItem}
                 deleteItem={deleteItemFromList}
                 style={styles.taskItem}
               />
-            );
-          }}
-        />
+            ))
+          ) : (
+            <></>
+          )}
+        </ScrollView>
       </View>
 
       <KeyboardAvoidingView
@@ -77,19 +73,19 @@ export default function App() {
 
 const styles = StyleSheet.create({
   body: {
-    flex: 1,
+    height: "100%",
     backgroundColor: "#FFE39C",
   },
   scrollViewContainer: {
     height: "90%",
-    justifyContent: "center",
   },
-  tasksContainer: { alignItems: "center" },
+  toDoListContainer: {
+    marginTop: "20%",
+    alignItems: "center",
+  },
   toDoListTitle: {
-    alignSelf: "center",
     fontSize: 30,
     fontWeight: "500",
-    marginTop: "15%",
     marginBottom: "10%",
     borderBottomWidth: 1,
     borderColor: "#8C7AA9",
@@ -127,3 +123,4 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
 });
+
